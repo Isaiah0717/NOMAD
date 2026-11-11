@@ -1,0 +1,24 @@
+# Secrets
+.env
+.env.*
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Runtime logs
+logs/
+*.log
+
+# NOMAD local/raw data
+data/
+
+# Editor / OS junk
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+NOMAD_CODE.txt

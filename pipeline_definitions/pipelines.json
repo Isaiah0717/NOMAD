@@ -1,0 +1,231 @@
+{
+  "pipelines": [
+    {
+      "name": "incoming_files",
+      "pipeline_type": "customer_file",
+      "enabled": true,
+      "source_type": "file",
+      "raw_storage": false,
+      "destination": "customers"
+    },
+    {
+      "name": "customer_api",
+      "pipeline_type": "customer_api",
+      "enabled": false,
+      "source_type": "api",
+      "raw_storage": false,
+      "destination": "customers"
+    },
+    {
+      "name": "weather_api",
+      "pipeline_type": "weather",
+      "enabled": true,
+      "source_type": "api",
+      "source_name": "Open-Meteo Fayetteville",
+      "raw_storage": true,
+      "destination": "weather_observations",
+      "parameters": {
+        "location_name": "Fayetteville, Arkansas",
+        "latitude": 36.0626,
+        "longitude": -94.1574
+      },
+      "validation": {
+        "field_rules": {
+          "temperature_f": {
+            "min": -40,
+            "max": 130
+          },
+          "apparent_temperature_f": {
+            "min": -60,
+            "max": 150
+          },
+          "relative_humidity": {
+            "min": 0,
+            "max": 100
+          },
+          "wind_speed_mph": {
+            "min": 0,
+            "max": 200
+          }
+        }
+      }
+    },
+    {
+      "name": "earthquake_api",
+      "pipeline_type": "earthquake",
+      "enabled": true,
+      "source_type": "api",
+      "source_name": "USGS Earthquake Daily Feed",
+      "raw_storage": false,
+      "destination": "events"
+    },
+    {
+      "name": "ai_news",
+      "pipeline_type": "ai_news",
+      "enabled": true,
+      "source_type": "rss",
+      "source_name": "OpenAI News",
+      "raw_storage": false,
+      "destination": "events"
+    },
+    {
+      "name": "argus",
+      "pipeline_type": "argus",
+      "enabled": true,
+      "source_type": "rss",
+      "source_name": "ARGUS World News (BBC, Al Jazeera, NPR)",
+      "raw_storage": false,
+      "destination": "events"
+    },
+    {
+      "name": "sports",
+      "pipeline_type": "sports",
+      "enabled": true,
+      "source_type": "api",
+      "source_name": "ESPN NFL",
+      "raw_storage": false,
+      "destination": "events"
+    },
+    {
+      "name": "market",
+      "pipeline_type": "market",
+      "enabled": true,
+      "source_type": "api",
+      "source_name": "Yahoo Finance via yfinance",
+      "raw_storage": false,
+      "destination": "events",
+      "parameters": {
+        "symbols": [
+          "MSFT",
+          "NVDA",
+          "AAPL",
+          "GOOGL",
+          "AMZN",
+          "META",
+          "AMD",
+          "TSLA",
+          "JPM",
+          "V",
+          "MA",
+          "CRM",
+          "ORCL",
+          "WMT",
+          "COST",
+          "HD",
+          "MCD",
+          "SPY",
+          "QQQ",
+          "COIN"
+        ]
+      }
+    },
+    {
+      "name": "pulse",
+      "pipeline_type": "pulse",
+      "enabled": true,
+      "source_type": "intelligence",
+      "source_name": "PULSE Market Change Detection",
+      "raw_storage": false,
+      "destination": "events",
+      "parameters": {
+        "save_events": true,
+        "fail_on_rejected": true
+      }
+    },
+    {
+      "name": "test_generic_api",
+      "pipeline_type": "api",
+      "enabled": true,
+      "source_type": "api",
+      "source_name": "JSONPlaceholder Posts",
+      "url": "https://jsonplaceholder.typicode.com/posts",
+      "raw_storage": true,
+      "destination": "staging_api_records",
+      "validation": {
+        "required_fields": [
+          "userId",
+          "id",
+          "title",
+          "body"
+        ],
+        "field_types": {
+          "userId": "integer",
+          "id": "integer",
+          "title": "string",
+          "body": "string"
+        },
+        "field_rules": {
+          "userId": {
+            "min": 1
+          },
+          "id": {
+            "min": 1
+          },
+          "title": {
+            "min_length": 1
+          },
+          "body": {
+            "min_length": 1
+          }
+        }
+      },
+      "standardization": {
+        "rename_fields": {
+          "userId": "user_id",
+          "id": "post_id"
+        }
+      }
+    },
+    {
+      "name": "entity_extraction",
+      "pipeline_type": "entity_extraction",
+      "enabled": true,
+      "source_type": "intelligence",
+      "source_name": "NOMAD Entity Intelligence",
+      "raw_storage": false,
+      "destination": "event_entities",
+      "parameters": {
+        "event_types": [
+          "AI_EVENT",
+          "WORLD_EVENT",
+          "SPORTS_EVENT",
+          "MARKET_EVENT"
+        ]
+      }
+    },
+    {
+      "name": "cortex",
+      "pipeline_type": "cortex",
+      "enabled": true,
+      "source_type": "intelligence",
+      "source_name": "CORTEX Incident Analysis",
+      "raw_storage": false,
+      "destination": "cortex_incidents",
+      "parameters": {
+        "event_types": [
+          "WORLD_EVENT"
+        ],
+        "print_diagnostics": false
+      }
+    },
+    {
+      "name": "entity_relationships",
+      "pipeline_type": "entity_relationships",
+      "enabled": true,
+      "source_type": "intelligence",
+      "source_name": "NOMAD Entity Intelligence",
+      "raw_storage": false,
+      "destination": "entity_relationships",
+      "parameters": {
+        "event_types": [
+          "AI_EVENT",
+          "WORLD_EVENT",
+          "SPORTS_EVENT",
+          "MARKET_EVENT"
+        ],
+        "min_co_occurrence": 1,
+        "top_n": 10
+      }
+    }
+  ]
+}
